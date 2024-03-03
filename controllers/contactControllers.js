@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Contacts=require("../model/contactModel");
 
 const getContact=asyncHandler(async(req,res)=>{
-    const contact=await Contacts.find()
+    const contact=await Contacts.find({user_id:req.user.id})
     res.status(200).json(contact)
   })
 
@@ -16,15 +16,16 @@ const getContactId=asyncHandler(async(req,res)=>{
 })
 
 const postContact=asyncHandler(async(req,res)=>{
-    console.log('this is the body',req.body);
+    // console.log('this is the body',req.body);
 
     const  {name,email,phone}=req.body 
     if(!name||!email||!phone){
          res.status(400)
          throw new Error("all fileds arr mandory")
     }
+    console.log(req.user.id);
     const contact=await Contacts.create({
-        name,email,phone
+        name,email,phone,user_id:req.user.id
     })
     res.status(200).json(contact)
   })
@@ -36,6 +37,7 @@ const putContact=asyncHandler(async(req,res)=>{
         res.status(404)
         throw new Error("contact not found")
     }
+    console.log(contact);
     const updateContact=await Contacts.findByIdAndUpdate(
       req.params.id,
       req.body,
